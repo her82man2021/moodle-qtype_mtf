@@ -299,4 +299,10 @@ body#page-question-type-mtf .optionbox,
 #page-mod-quiz-attempt .que.mtf .mtfresponsebutton label {
     padding: 10px;
 }
+.qtype_mtf_generaltable {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: var(--bs-emphasis-color);
+    background-color: var(--bs-body-bg);
+}
 /* stylelint-enable declaration-no-important  */

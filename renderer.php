@@ -80,16 +80,9 @@ class qtype_mtf_renderer extends qtype_renderer {
     public function formulation_and_controls(question_attempt $qa, question_display_options $displayoptions) {
         global $CFG;
 
-        if ($CFG->version > 2025041403) {
-            // Styles for Moodle 5.0 and later with Bootstrap 5.
-            $tableclass = 'table-reboot';
-            $tdadditionalclass = ' m-3';
-            $tdcenterclass = ' text-center';
-        } else {
-            $tableclass = 'generaltable';
-            $tdadditionalclass = '';
-            $tdcenterclass = ' ';
-        }
+        $tableclass = 'generaltable qtype_mtf_generaltable';
+        $tdadditionalclass = '';
+        $tdcenterclass = '';
 
         $question = $qa->get_question();
         $hasdeduction = ($question->scoringmethod === 'subpointdeduction' && get_config('qtype_mtf')->allowdeduction);
@@ -259,9 +252,6 @@ class qtype_mtf_renderer extends qtype_renderer {
                         ['class' => 'mtfspecificfeedback' . $tdadditionalclass]
                     )
                 );
-                $rowdata[] = $cell;
-            } else {
-                $cell = new html_table_cell(html_writer::tag('div', ''));
                 $rowdata[] = $cell;
             }
             $rowmo = new html_table_row($rowdata);
