@@ -43,7 +43,10 @@ class qtype_mtf_question extends question_graded_automatically_with_countback {
     public $deduction;
     /** @var bool shuffleanswers */
     public $shuffleanswers;
+    /** @var string tableformat */
+    public $tableformat;
     /** @var int numberofrows */
+
     public $numberofrows;
     /** @var int numberofcolumns */
     public $numberofcolumns;

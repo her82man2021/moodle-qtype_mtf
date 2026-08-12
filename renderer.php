@@ -105,28 +105,50 @@ class qtype_mtf_renderer extends qtype_renderer {
         $table->attributes['class'] = $tableclass;
 
         $table->head = [];
+        $isleftformat = ($question->tableformat === 'left');
 
         // If the question has a deduction defined, add empty header for column with trash icon.
         if ($hasdeduction) {
             $table->head[] = '';
         }
 
-        // Add empty header for option texts.
-        // Add the response texts as table headers.
-        foreach ($question->columns as $column) {
-            $cell = new html_table_cell(
-                $question->make_html_inline(
-                    $question->format_text(
-                        $column->responsetext,
-                        $column->responsetextformat,
-                        $qa,
-                        'question',
-                        'response',
-                        $column->id
+        // Add header for option texts or response choices depending on tableformat setting.
+        if ($isleftformat) {
+            // Left format: Response texts (True/False) first, then Option text header.
+            foreach ($question->columns as $column) {
+                $cell = new html_table_cell(
+                    $question->make_html_inline(
+                        $question->format_text(
+                            $column->responsetext,
+                            $column->responsetextformat,
+                            $qa,
+                            'question',
+                            'response',
+                            $column->id
+                        )
                     )
-                )
-            );
-            $table->head[] = $cell;
+                );
+                $table->head[] = $cell;
+            }
+            $table->head[] = ''; // Empty header for option texts.
+        } else {
+            // Right format (default): Empty header for option text first, then Response texts (True/False).
+            $table->head[] = ''; // Empty header for option texts.
+            foreach ($question->columns as $column) {
+                $cell = new html_table_cell(
+                    $question->make_html_inline(
+                        $question->format_text(
+                            $column->responsetext,
+                            $column->responsetextformat,
+                            $qa,
+                            'question',
+                            'response',
+                            $column->id
+                        )
+                    )
+                );
+                $table->head[] = $cell;
+            }
         }
 
         // Add empty header for correctness if needed.
@@ -163,7 +185,8 @@ class qtype_mtf_renderer extends qtype_renderer {
                 $rowdata[] = $trashcell;
             }
 
-            // Add the response radio buttons to the table.
+            // Prepare response radio buttons cells.
+            $radiocells = [];
             foreach ($question->columns as $column) {
                 $buttonname = $qa->get_field_prefix() . $field;
                 $buttonid = 'qtype_mtf_' . $qa->get_field_prefix() . $field;
@@ -197,10 +220,10 @@ class qtype_mtf_renderer extends qtype_renderer {
                 }
                 $cell = new html_table_cell($radio);
                 $cell->attributes['class'] = 'mtfresponsebutton radio' . $tdcenterclass;
-                $rowdata[] = $cell;
+                $radiocells[] = $cell;
             }
 
-            // Add the formated option text to the table.
+            // Prepare formatted option text cell.
             $rowtext = '<span class="optiontext">' .
                         $question->make_html_inline(
                             $this->number_in_style(
@@ -218,11 +241,25 @@ class qtype_mtf_renderer extends qtype_renderer {
                         ) .
                         '</span>';
 
-            $cell = new html_table_cell($rowtext);
-            $cell->attributes['class'] = 'optiontext' . $tdadditionalclass;
-            $rowdata[] = $cell;
+            $optioncell = new html_table_cell($rowtext);
+            $optioncell->attributes['class'] = 'optiontext' . $tdadditionalclass;
+
+            if ($isleftformat) {
+                // Left format: radio cells first, then option text cell.
+                foreach ($radiocells as $rcell) {
+                    $rowdata[] = $rcell;
+                }
+                $rowdata[] = $optioncell;
+            } else {
+                // Right format: option text cell first, then radio cells.
+                $rowdata[] = $optioncell;
+                foreach ($radiocells as $rcell) {
+                    $rowdata[] = $rcell;
+                }
+            }
 
             $rowcount++;
+
 
             // Has a selection been made for this option?
             $isselected = $question->is_answered($response, $key);

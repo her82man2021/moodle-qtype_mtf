@@ -115,6 +115,10 @@ class qtype_mtf extends question_type {
         if (!isset($question->options->shuffleanswers)) {
             $question->options->shuffleanswers = $mtfconfig->shuffleanswers;
         }
+        if (!isset($question->options->tableformat)) {
+            $question->options->tableformat = $mtfconfig->tableformat ?? 'right';
+        }
+
         if (!isset($question->options->deduction)) {
             $question->options->deduction = 0.0;
         }
@@ -241,7 +245,9 @@ class qtype_mtf extends question_type {
             $options->questionid = $question->id;
             $options->scoringmethod = '';
             $options->shuffleanswers = '';
+            $options->tableformat = 'right';
             $options->numberofcolumns = '';
+
             $options->numberofrows = '';
             $options->answernumbering = '';
             $options->deduction = 0.0;
@@ -287,7 +293,9 @@ class qtype_mtf extends question_type {
 
         $options->scoringmethod = $question->scoringmethod;
         $options->shuffleanswers = $question->shuffleanswers;
+        $options->tableformat = $question->tableformat ?? 'right';
         $options->numberofrows = $countfilledrows;
+
         $options->numberofcolumns = $question->numberofcolumns;
         $options->answernumbering = $question->answernumbering;
         $options->deduction = $question->deduction;
@@ -515,7 +523,9 @@ class qtype_mtf extends question_type {
     protected function initialise_question_instance(question_definition $question, $questiondata) {
         parent::initialise_question_instance($question, $questiondata);
         $question->shuffleanswers = $questiondata->options->shuffleanswers;
+        $question->tableformat = $questiondata->options->tableformat ?? 'right';
         $question->scoringmethod = $questiondata->options->scoringmethod;
+
         // If the admin does not allow deductions, we discard the value from the DB
         // and use 0.0 instead.
         if (get_config('qtype_mtf')->allowdeduction) {
@@ -743,7 +753,10 @@ class qtype_mtf extends question_type {
                  "</scoringmethod>\n";
         $expout .= '    <shuffleanswers>' . $format->get_single($question->options->shuffleanswers) .
                  "</shuffleanswers>\n";
+        $expout .= '    <tableformat>' . ($question->options->tableformat ?? 'right') .
+                 "</tableformat>\n";
         $expout .= '    <numberofrows>' . $question->options->numberofrows . "</numberofrows>\n";
+
         $expout .= '    <numberofcolumns>' . $question->options->numberofcolumns .
                  "</numberofcolumns>\n";
         $expout .= '    <answernumbering>' . $question->options->answernumbering .
@@ -819,7 +832,9 @@ class qtype_mtf extends question_type {
         $question->qtype = 'mtf';
         $question->scoringmethod = $format->getpath($data, ['#', 'scoringmethod', 0, '#', 'text', 0, '#'], 'mtf');
         $question->shuffleanswers = $format->trans_single($format->getpath($data, ['#', 'shuffleanswers', 0, '#'], 1));
+        $question->tableformat = $format->getpath($data, ['#', 'tableformat', 0, '#'], 'right');
         $question->numberofrows = $format->getpath($data, ['#', 'numberofrows', 0, '#'], QTYPE_MTF_NUMBER_OF_OPTIONS);
+
         $question->numberofcolumns = $format->getpath($data, ['#', 'numberofcolumns', 0, '#'], QTYPE_MTF_NUMBER_OF_RESPONSES);
         $question->answernumbering = $format->getpath($data, ['#', 'answernumbering', 0, '#'], 'none');
         $question->deduction = $format->getpath($data, ['#', 'deduction', 0, '#'], '0.0');

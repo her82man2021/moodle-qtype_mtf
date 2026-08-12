@@ -72,4 +72,19 @@ if ($ADMIN->fulltree) {
         get_string('shuffleanswers_help', 'qtype_mtf'),
         1
     ));
+
+    // Question table format.
+    $tableformatoptions = [
+        'left' => get_string('tableformatleft', 'qtype_mtf'),
+        'right' => get_string('tableformatright', 'qtype_mtf'),
+    ];
+
+    $settings->add(new admin_setting_configselect(
+        'qtype_mtf/tableformat',
+        get_string('configtableformat', 'qtype_mtf'),
+        get_string('configtableformat_help', 'qtype_mtf'),
+        'right',
+        $tableformatoptions
+    ));
 }
+

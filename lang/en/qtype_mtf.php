@@ -96,3 +96,8 @@ $string['shuffleanswers_help'] = 'If enabled, the order of the options is random
 $string['stem'] = 'Stem';
 $string['tasktitle'] = 'Task title';
 $string['true'] = 'Correct';
+$string['configtableformat'] = 'Question table format';
+$string['configtableformat_help'] = 'Select the position of True/False (judgement) choices in the question table layout.';
+$string['tableformatleft'] = 'True/False on the left side';
+$string['tableformatright'] = 'True/False on the right side';
+

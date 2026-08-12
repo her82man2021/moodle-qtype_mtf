@@ -326,6 +326,15 @@ class qtype_mtf_edit_form extends question_edit_form {
         $mform->addElement('advcheckbox', 'shuffleanswers', get_string('shuffleanswers', 'qtype_mtf'), null, null, [0, 1]);
         $mform->addHelpButton('shuffleanswers', 'shuffleanswers', 'qtype_mtf');
 
+        $tableformatoptions = [
+            'left' => get_string('tableformatleft', 'qtype_mtf'),
+            'right' => get_string('tableformatright', 'qtype_mtf'),
+        ];
+        $mform->addElement('select', 'tableformat', get_string('configtableformat', 'qtype_mtf'), $tableformatoptions);
+        $mform->addHelpButton('tableformat', 'configtableformat', 'qtype_mtf');
+        $mform->setDefault('tableformat', get_config('qtype_mtf')->tableformat ?? 'right');
+
+
         if (get_config('qtype_mtf')->allowdeduction) {
             $mform->addElement('text', 'deduction', get_string('deduction', 'qtype_mtf'), ['size' => 6]);
             $mform->addHelpButton('deduction', 'deduction', 'qtype_mtf');
@@ -563,7 +572,9 @@ class qtype_mtf_edit_form extends question_edit_form {
 
         if (isset($question->options)) {
             $question->shuffleanswers = $question->options->shuffleanswers;
+            $question->tableformat = $question->options->tableformat ?? 'right';
             $question->scoringmethod = $question->options->scoringmethod;
+
             $question->deduction = $question->options->deduction;
             $question->rows = $question->options->rows;
             $question->columns = $question->options->columns;
