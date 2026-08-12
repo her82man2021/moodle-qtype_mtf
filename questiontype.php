@@ -237,6 +237,8 @@ class qtype_mtf extends question_type {
         $context = $question->context;
         $result = new stdClass();
 
+        $transaction = $DB->start_delegated_transaction();
+
         // Insert all the new options.
         $options = $DB->get_record('qtype_mtf_options', ['questionid' => $question->id]);
 
@@ -293,7 +295,8 @@ class qtype_mtf extends question_type {
 
         $options->scoringmethod = $question->scoringmethod;
         $options->shuffleanswers = $question->shuffleanswers;
-        $options->tableformat = $question->tableformat ?? 'right';
+        $tableformat = $question->tableformat ?? 'right';
+        $options->tableformat = in_array($tableformat, ['left', 'right']) ? $tableformat : 'right';
         $options->numberofrows = $countfilledrows;
 
         $options->numberofcolumns = $question->numberofcolumns;
@@ -366,8 +369,9 @@ class qtype_mtf extends question_type {
                 $column->id = $DB->insert_record('qtype_mtf_columns', $column);
             }
 
-            // Perform an update.
-            $column->responsetext = $question->{'responsetext_' . $i};
+            // Perform an update with sanitized response text.
+            $rawtext = $question->{'responsetext_' . $i} ?? '';
+            $column->responsetext = clean_text($rawtext, FORMAT_MOODLE);
             $column->responsetextformat = FORMAT_MOODLE;
             $DB->update_record('qtype_mtf_columns', $column);
             $newcols[$column->id] = $column->id;
@@ -426,7 +430,10 @@ class qtype_mtf extends question_type {
                 $DB->delete_records('qtype_mtf_weights', ['id' => $oldweightrecord->id]);
             }
         }
+
+        $transaction->allow_commit();
     }
+
 
     /**
      * Save question hints
